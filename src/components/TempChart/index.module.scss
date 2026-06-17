@@ -1,0 +1,81 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.statItem {
+  text-align: center;
+  padding: $spacing-sm;
+  background: rgba($color-primary, 0.04);
+  border-radius: $radius-md;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.statValue {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.good { color: $color-success; }
+.warn { color: $color-warning; }
+.bad { color: $color-error; }
+
+.canvasWrap {
+  width: 100%;
+  margin-bottom: $spacing-md;
+}
+
+.canvas {
+  display: block;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-xl;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.legendDot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: $radius-round;
+}
+
+.legendText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.empty {
+  padding: $spacing-xl;
+  text-align: center;
+}
+
+.emptyText {
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+}

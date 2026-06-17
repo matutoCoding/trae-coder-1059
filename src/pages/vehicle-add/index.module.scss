@@ -1,0 +1,310 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  padding: $spacing-lg 0 $spacing-xl;
+  min-height: 100vh;
+  background: $color-bg-page;
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.section {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  &::before {
+    content: '';
+    width: 6rpx;
+    height: 32rpx;
+    background: linear-gradient(180deg, $color-primary, $color-accent-cyan);
+    border-radius: $radius-xs;
+  }
+}
+
+.formItem {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.formLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+  display: flex;
+  align-items: center;
+
+  .required {
+    color: $color-error;
+    margin-right: 4rpx;
+  }
+}
+
+.formInput {
+  width: 100%;
+  height: 80rpx;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  border-radius: $radius-md;
+  padding: 0 $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  transition: all $transition-fast;
+
+  &:focus {
+    border-color: $color-primary;
+    background: $color-bg-card;
+  }
+}
+
+.formTextarea {
+  width: 100%;
+  min-height: 160rpx;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  line-height: $line-height-normal;
+}
+
+.tempRangeRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.tempInputWrap {
+  flex: 1;
+}
+
+.tempSeparator {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-semibold;
+}
+
+.tempUnit {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-left: -56rpx;
+  margin-right: $spacing-sm;
+  position: relative;
+  z-index: 1;
+}
+
+.rowGrid {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.rowItem {
+  flex: 1;
+}
+
+.pickerWrap {
+  position: relative;
+}
+
+.pickerValue {
+  width: 100%;
+  height: 80rpx;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: 0 $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.pickerPlaceholder {
+  color: $color-text-disabled;
+}
+
+.pickerArrow {
+  color: $color-text-tertiary;
+  font-size: $font-size-md;
+}
+
+.levelOptions {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.levelOption {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+
+  &.active {
+    background: linear-gradient(135deg, $color-primary, $color-primary-light);
+    border-color: $color-primary;
+    color: $color-text-white;
+    box-shadow: 0 4rpx 12rpx rgba($color-primary, 0.25);
+  }
+}
+
+.statusOptions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.statusOption {
+  flex: 1;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  transition: all $transition-fast;
+
+  &.active {
+    border-color: currentColor;
+
+    &.idle {
+      background: rgba($color-vehicle-idle, 0.1);
+      color: $color-vehicle-idle;
+    }
+
+    &.running {
+      background: rgba($color-vehicle-running, 0.1);
+      color: $color-vehicle-running;
+    }
+
+    &.maintain {
+      background: rgba($color-vehicle-maintain, 0.1);
+      color: $color-vehicle-maintain;
+    }
+  }
+}
+
+.vehicleTypes {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.typeTag {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  transition: all $transition-fast;
+
+  &.active {
+    background: rgba($color-primary, 0.1);
+    border-color: $color-primary;
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.submitBar {
+  position: sticky;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.btnReset {
+  flex: 1;
+  height: $button-height-lg;
+  background: $color-bg-page;
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.btnSubmit {
+  flex: 2;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+  box-shadow: 0 8rpx 24rpx rgba($color-primary, 0.3);
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 4rpx 12rpx rgba($color-primary, 0.2);
+  }
+}
+
+.tipsCard {
+  background: linear-gradient(135deg, rgba($color-accent-cyan, 0.1) 0%, rgba($color-primary, 0.05) 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  margin-bottom: $spacing-lg;
+  border-left: 6rpx solid $color-accent-cyan;
+}
+
+.tipsTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  margin-bottom: $spacing-xs;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.tipsText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}

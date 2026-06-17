@@ -1,0 +1,47 @@
+// ============================================
+// 冷链物流主题配色变量
+// ============================================
+
+// 品牌主题色：冷链蓝
+$color-primary: #1E88E5;
+$color-primary-light: #42A5F5;
+$color-primary-dark: #1565C0;
+
+// 辅助色
+$color-accent-cyan: #26C6DA;
+$color-accent-green: #43A047;
+$color-accent-orange: #FF8F00;
+$color-accent-purple: #7B1FA2;
+
+// 功能色
+$color-success: #43A047;
+$color-warning: #FB8C00;
+$color-error: #E53935;
+$color-info: #1E88E5;
+
+// 背景色
+$color-bg-page: #F0F7FF;
+$color-bg-card: #FFFFFF;
+$color-bg-hover: #E3F2FD;
+$color-bg-gradient: linear-gradient(180deg, #E3F2FD 0%, #F0F7FF 100%);
+
+// 文本色
+$color-text-primary: #1A237E;
+$color-text-secondary: #546E7A;
+$color-text-tertiary: #90A4AE;
+$color-text-disabled: #B0BEC5;
+$color-text-white: #FFFFFF;
+
+// 边框色
+$color-border: #BBDEFB;
+$color-divider: #E3F2FD;
+
+// 业务相关颜色
+$color-temp-normal: #43A047;
+$color-temp-warning: #FB8C00;
+$color-temp-danger: #E53935;
+$color-price-start: #FF8F00;
+$color-price-cap: #7B1FA2;
+$color-vehicle-idle: #43A047;
+$color-vehicle-running: #1E88E5;
+$color-vehicle-maintain: #FB8C00;

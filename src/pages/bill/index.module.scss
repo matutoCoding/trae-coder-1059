@@ -1,0 +1,205 @@
+@use '@/styles/variables.scss' as *;
+
+.page { padding: $spacing-lg 0; }
+.content { padding: 0 $page-padding; }
+
+.summaryCard {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  box-shadow: 0 8rpx 32rpx rgba($color-primary, 0.25);
+  margin-bottom: $spacing-lg;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -80rpx;
+    right: -60rpx;
+    width: 240rpx;
+    height: 240rpx;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.sumLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.sumAmount {
+  font-size: 72rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  line-height: 1;
+  margin-bottom: $spacing-lg;
+  display: block;
+
+  .yuan {
+    font-size: $font-size-lg;
+    font-weight: normal;
+    margin-right: $spacing-xs;
+  }
+}
+
+.sumBreakdown {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+}
+
+.sumItem {
+  .num {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-white;
+    display: block;
+    margin-bottom: 4rpx;
+  }
+  .lbl {
+    font-size: $font-size-xs;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.rulesSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-lg;
+}
+
+.rulesTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.ruleItem {
+  border: 2rpx solid $color-divider;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+.ruleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.ruleName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.ruleDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background: $color-bg-hover;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.ruleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm $spacing-md;
+}
+
+.ruleCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.ruleCellLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.ruleCellValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+
+  &.start { color: $color-accent-orange; font-weight: $font-weight-bold; }
+  &.cap { color: $color-accent-purple; font-weight: $font-weight-bold; }
+}
+
+.boundaryExplain {
+  background: linear-gradient(90deg, rgba($color-accent-orange, 0.08), rgba($color-accent-purple, 0.08));
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-top: $spacing-md;
+  border-left: 6rpx solid $color-accent-cyan;
+}
+
+.boundaryTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.boundaryDesc {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  line-height: 1.6;
+}
+
+.boundaryList {
+  margin-top: $spacing-xs;
+}
+
+.boundaryItem {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-xs;
+  margin-bottom: 4rpx;
+
+  &::before {
+    content: '•';
+    color: $color-accent-cyan;
+    font-weight: bold;
+  }
+}
+
+.filterRow {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.filterTab {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  background: $color-bg-card;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+
+  &.active {
+    background: $color-primary;
+    color: $color-text-white;
+  }
+}
+
+.billList { margin-bottom: 120rpx; }

@@ -1,0 +1,56 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6rpx;
+    border-radius: $radius-lg $radius-lg 0 0;
+  }
+}
+
+.blue::before { background: linear-gradient(90deg, $color-primary, $color-accent-cyan); }
+.green::before { background: linear-gradient(90deg, $color-success, $color-accent-cyan); }
+.orange::before { background: linear-gradient(90deg, $color-warning, $color-accent-orange); }
+.purple::before { background: linear-gradient(90deg, $color-accent-purple, $color-primary-light); }
+
+.title {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: $spacing-xs;
+}
+
+.value {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: 1.2;
+}
+
+.unit {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-left: $spacing-xs;
+}
+
+.subValue {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

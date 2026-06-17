@@ -1,0 +1,168 @@
+@use '@/styles/variables.scss' as *;
+
+.page { padding: $spacing-lg 0; }
+.content { padding: 0 $page-padding; }
+
+.statusBanner {
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-lg;
+  color: $color-text-white;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+}
+
+.statusPending { background: linear-gradient(135deg, $color-warning 0%, darken($color-warning, 10%) 100%); }
+.statusAssigned { background: linear-gradient(135deg, $color-info 0%, darken($color-info, 10%) 100%); }
+.statusTransit { background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%); }
+.statusDone { background: linear-gradient(135deg, $color-success 0%, darken($color-success, 10%) 100%); }
+
+.statusText {
+  font-size: 44rpx;
+  font-weight: $font-weight-bold;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.orderNoSmall {
+  font-size: $font-size-sm;
+  opacity: 0.85;
+}
+
+.sectionCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.sectionName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.routeFlow {
+  display: flex;
+  align-items: stretch;
+  gap: $spacing-md;
+}
+
+.routeCol {
+  flex: 1;
+  min-width: 0;
+}
+
+.routePointLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.routeCity {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.routeAddr {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.routeArrow {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.arrowIcon {
+  font-size: 32rpx;
+  color: $color-primary;
+  margin-bottom: 4rpx;
+}
+
+.arrowInfo {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  text-align: center;
+}
+
+.infoPair {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-xs 0;
+}
+
+.infoKey {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.infoVal {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.tempBadge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba($color-accent-cyan, 0.12);
+  color: $color-accent-cyan;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-xs;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.billPreview {
+  background: linear-gradient(90deg, rgba($color-primary, 0.06), rgba($color-accent-cyan, 0.06));
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  border: 2rpx solid rgba($color-primary, 0.1);
+}
+
+.billRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-xs 0;
+
+  &.totalRow {
+    border-top: 1rpx dashed $color-border;
+    margin-top: $spacing-xs;
+    padding-top: $spacing-sm;
+  }
+}
+
+.billLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.billValue {
+  font-size: $font-size-xs;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.totalRow .billLabel { font-size: $font-size-sm; color: $color-text-primary; font-weight: $font-weight-semibold; }
+.totalRow .billValue { font-size: $font-size-lg; color: $color-primary; font-weight: $font-weight-bold; }

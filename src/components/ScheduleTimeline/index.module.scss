@@ -1,0 +1,172 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.daysHeader {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: $spacing-xs;
+  margin-bottom: $spacing-lg;
+}
+
+.dayCell {
+  text-align: center;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  background: rgba($color-primary, 0.04);
+}
+
+.today {
+  background: linear-gradient(135deg, rgba($color-primary, 0.15), rgba($color-accent-cyan, 0.1));
+  border: 2rpx solid rgba($color-primary, 0.3);
+}
+
+.dayLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.today .dayLabel {
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.dateLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.timelineBody {
+  width: 100%;
+}
+
+.itemsWrap {}
+
+.empty {
+  padding: $spacing-xl;
+  text-align: center;
+}
+
+.emptyText {
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+}
+
+.itemRow {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.timeCol {
+  width: 100rpx;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8rpx;
+}
+
+.timeStart, .timeEnd {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.timeLine {
+  width: 4rpx;
+  flex: 1;
+  min-height: 40rpx;
+  margin: 8rpx 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    $color-primary,
+    $color-primary 8rpx,
+    transparent 8rpx,
+    transparent 14rpx
+  );
+  border-radius: 2rpx;
+}
+
+.contentCol {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemCard {
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  border-left: 6rpx solid;
+}
+
+.itemCard.upcoming {
+  background: rgba($color-warning, 0.06);
+  border-left-color: $color-warning;
+}
+.itemCard.ongoing {
+  background: rgba($color-primary, 0.08);
+  border-left-color: $color-primary;
+}
+.itemCard.completed {
+  background: rgba($color-success, 0.06);
+  border-left-color: $color-success;
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xs;
+}
+
+.statusDot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: $radius-round;
+}
+.statusDot.upcoming { background: $color-warning; }
+.statusDot.ongoing { background: $color-primary; }
+.statusDot.completed { background: $color-success; }
+
+.statusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+.upcoming .statusText { color: $color-warning; }
+.ongoing .statusText { color: $color-primary; }
+.completed .statusText { color: $color-success; }
+
+.dateTag {
+  margin-left: auto;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 4rpx 10rpx;
+  border-radius: $radius-xs;
+}
+
+.itemTitle {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  display: block;
+  margin-bottom: 4rpx;
+  @include text-ellipsis;
+}
+
+.itemOrder {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

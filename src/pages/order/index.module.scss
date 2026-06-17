@@ -1,0 +1,126 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  padding: $spacing-lg 0;
+}
+
+.header {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.welcomeRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: $spacing-lg;
+}
+
+.welcomeText {
+  .title {
+    font-size: $font-size-xxl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    display: block;
+    margin-bottom: $spacing-xs;
+  }
+  .subtitle {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}
+
+.quickBtn {
+  @include button-reset;
+  background: linear-gradient(135deg, $color-primary 0%, $color-accent-cyan 100%);
+  color: $color-text-white;
+  padding: 0 $spacing-lg;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.96);
+  }
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.statBlock {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  text-align: center;
+  box-shadow: $shadow-card;
+
+  .num {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+    display: block;
+    margin-bottom: 4rpx;
+  }
+  .lbl {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+  }
+}
+
+.tabsRow {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  overflow-x: auto;
+  padding-bottom: $spacing-sm;
+}
+
+.tabItem {
+  flex-shrink: 0;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-button;
+  background: $color-bg-card;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+
+  &.active {
+    background: $color-primary;
+    color: $color-text-white;
+    box-shadow: 0 4rpx 16rpx rgba($color-primary, 0.3);
+  }
+}
+
+.listSection {
+  padding: 0 $page-padding;
+}
+
+.fab {
+  position: fixed;
+  right: $page-padding;
+  bottom: 180rpx;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, $color-primary, $color-primary-dark);
+  color: $color-text-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 32rpx rgba($color-primary, 0.4);
+  font-size: 60rpx;
+  font-weight: 300;
+  z-index: 100;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.9);
+  }
+}

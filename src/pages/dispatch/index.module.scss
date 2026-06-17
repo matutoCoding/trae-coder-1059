@@ -1,0 +1,265 @@
+@use '@/styles/variables.scss' as *;
+
+.page { padding: $spacing-lg 0; }
+.content { padding: 0 $page-padding; }
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.loadBalance {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-lg;
+}
+
+.lbHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.lbTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.lbValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-accent-cyan;
+}
+
+.lbBars {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.lbRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.lbLabel {
+  width: 120rpx;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  flex-shrink: 0;
+}
+
+.lbTrack {
+  flex: 1;
+  height: 24rpx;
+  background: $color-divider;
+  border-radius: $radius-round;
+  overflow: hidden;
+  position: relative;
+}
+
+.lbFill {
+  height: 100%;
+  border-radius: $radius-round;
+  transition: width $transition-slow;
+}
+
+.lbFill.idle { background: linear-gradient(90deg, #A5D6A7, $color-success); }
+.lbFill.running { background: linear-gradient(90deg, #64B5F6, $color-primary); }
+.lbFill.maintain { background: linear-gradient(90deg, #FFB74D, $color-warning); }
+.lbFill.fragment { background: linear-gradient(90deg, #EF9A9A, $color-error); }
+
+.lbPct {
+  width: 80rpx;
+  text-align: right;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  flex-shrink: 0;
+}
+
+.section {
+  margin-bottom: $spacing-lg;
+}
+
+.pendingItem {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  border-left: 8rpx solid $color-warning;
+}
+
+.piHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.piOrder {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.piCargo {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.piRoute {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: rgba($color-warning, 0.05);
+  border-radius: $radius-md;
+}
+
+.piDot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: $radius-round;
+  margin-top: 6rpx;
+  flex-shrink: 0;
+}
+
+.piDot.orig { background: $color-success; }
+.piDot.dest { background: $color-error; }
+
+.piPoints { flex: 1; min-width: 0; }
+.piCity {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+}
+.piAddr {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+.piDivider {
+  width: 2rpx;
+  align-self: stretch;
+  background: repeating-linear-gradient(
+    to bottom, $color-border 0, $color-border 6rpx, transparent 6rpx, transparent 12rpx
+  );
+  margin: 0 $spacing-xs;
+}
+
+.piMatchBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-warning, $color-accent-orange);
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &:active { transform: scale(0.97); opacity: 0.9; }
+}
+
+.candidatesCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-top: $spacing-md;
+}
+
+.candidatesTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.candidateItem {
+  border: 2rpx solid $color-divider;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+  transition: all $transition-base;
+
+  &.best {
+    border-color: rgba($color-success, 0.4);
+    background: rgba($color-success, 0.05);
+  }
+}
+
+.ciHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.ciPlate {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.ciScore {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-success;
+
+  .max { color: $color-text-tertiary; font-weight: normal; font-size: $font-size-sm; }
+}
+
+.ciReasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+.ciReason {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  background: $color-bg-hover;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.idlePool {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.poolHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.poolTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.poolCount {
+  font-size: $font-size-sm;
+  color: $color-success;
+  font-weight: $font-weight-semibold;
+}

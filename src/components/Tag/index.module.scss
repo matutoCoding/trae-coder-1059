@@ -1,0 +1,59 @@
+@use '@/styles/variables.scss' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-sm;
+  white-space: nowrap;
+}
+
+.text {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.sm {
+  padding: 4rpx 12rpx;
+  .text { font-size: $font-size-xs; }
+}
+
+.md {
+  padding: 8rpx 16rpx;
+  .text { font-size: $font-size-sm; }
+}
+
+.primary {
+  background: rgba($color-primary, 0.1);
+  color: $color-primary;
+}
+
+.success {
+  background: rgba($color-success, 0.1);
+  color: $color-success;
+}
+
+.warning {
+  background: rgba($color-warning, 0.1);
+  color: $color-warning;
+}
+
+.error {
+  background: rgba($color-error, 0.1);
+  color: $color-error;
+}
+
+.info {
+  background: rgba($color-text-tertiary, 0.1);
+  color: $color-text-tertiary;
+}
+
+.startPrice {
+  background: rgba($color-accent-orange, 0.1);
+  color: $color-accent-orange;
+}
+
+.capPrice {
+  background: rgba($color-accent-purple, 0.1);
+  color: $color-accent-purple;
+}

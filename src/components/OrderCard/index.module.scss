@@ -1,0 +1,187 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-md;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.orderNo {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.cargoTypeTag {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.route {
+  background: linear-gradient(180deg, rgba($color-primary, 0.03) 0%, rgba($color-accent-cyan, 0.03) 100%);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.routePoint {
+  display: flex;
+  align-items: flex-start;
+}
+
+.originDot, .destDot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: $radius-round;
+  margin-top: 8rpx;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.originDot {
+  background: $color-success;
+  box-shadow: 0 0 0 6rpx rgba($color-success, 0.15);
+}
+
+.destDot {
+  background: $color-error;
+  box-shadow: 0 0 0 6rpx rgba($color-error, 0.15);
+}
+
+.routeInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.city {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.address {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+.routeLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 38rpx;
+  margin: $spacing-xs 0;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 10rpx;
+    top: 50%;
+    width: 2rpx;
+    height: 36rpx;
+    background: repeating-linear-gradient(
+      to bottom,
+      $color-border 0,
+      $color-border 6rpx,
+      transparent 6rpx,
+      transparent 12rpx
+    );
+    transform: translateY(-50%);
+  }
+}
+
+.arrow {
+  color: $color-primary;
+  font-size: $font-size-md;
+}
+
+.distanceTag {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background: rgba($color-primary, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.cargoInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm 0;
+  border-top: 1rpx solid $color-divider;
+  border-bottom: 1rpx solid $color-divider;
+  margin-bottom: $spacing-md;
+}
+
+.cargoRow {
+  flex: 1;
+}
+
+.cargoName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.cargoSpec {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.tempTag {
+  font-size: $font-size-sm;
+  color: $color-accent-cyan;
+  background: rgba($color-accent-cyan, 0.1);
+  padding: 8rpx 16rpx;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeInfo {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.assignedTag {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  background: rgba($color-primary, 0.1);
+  padding: 6rpx 14rpx;
+  border-radius: $radius-xs;
+}

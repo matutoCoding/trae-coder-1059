@@ -1,0 +1,478 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  padding: $spacing-lg 0 $spacing-xl;
+  min-height: 100vh;
+  background: $color-bg-page;
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.section {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  &::before {
+    content: '';
+    width: 6rpx;
+    height: 32rpx;
+    background: linear-gradient(180deg, $color-primary, $color-accent-cyan);
+    border-radius: $radius-xs;
+  }
+}
+
+.formItem {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.formLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+  display: flex;
+  align-items: center;
+
+  .required {
+    color: $color-error;
+    margin-right: 4rpx;
+  }
+}
+
+.formInput {
+  width: 100%;
+  height: 80rpx;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  border-radius: $radius-md;
+  padding: 0 $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  transition: all $transition-fast;
+
+  &:focus {
+    border-color: $color-primary;
+    background: $color-bg-card;
+  }
+}
+
+.formTextarea {
+  width: 100%;
+  min-height: 160rpx;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  line-height: $line-height-normal;
+}
+
+.cargoTypes {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.cargoTypeTag {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  transition: all $transition-fast;
+
+  &.active {
+    background: rgba($color-primary, 0.1);
+    border-color: $color-primary;
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.tempRangeRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.tempInputWrap {
+  flex: 1;
+}
+
+.tempSeparator {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-semibold;
+}
+
+.rowGrid {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.rowItem {
+  flex: 1;
+}
+
+.pickerWrap {
+  position: relative;
+}
+
+.pickerValue {
+  width: 100%;
+  height: 80rpx;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: 0 $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.pickerPlaceholder {
+  color: $color-text-disabled;
+}
+
+.pickerArrow {
+  color: $color-text-tertiary;
+  font-size: $font-size-md;
+}
+
+.routeCard {
+  background: linear-gradient(135deg, rgba($color-primary, 0.05) 0%, rgba($color-accent-cyan, 0.05) 100%);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  position: relative;
+}
+
+.routeLine {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm 0;
+
+  & + & {
+    border-top: 1rpx dashed $color-border;
+    margin-top: $spacing-xs;
+    padding-top: $spacing-sm;
+  }
+}
+
+.routeDot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+
+  &.origin {
+    background: $color-success;
+    box-shadow: 0 0 0 6rpx rgba($color-success, 0.15);
+  }
+
+  &.dest {
+    background: $color-error;
+    box-shadow: 0 0 0 6rpx rgba($color-error, 0.15);
+  }
+}
+
+.routeConnector {
+  position: absolute;
+  left: 41rpx;
+  top: 68rpx;
+  width: 2rpx;
+  height: 56rpx;
+  background: repeating-linear-gradient(
+    180deg,
+    $color-border 0,
+    $color-border 8rpx,
+    transparent 8rpx,
+    transparent 16rpx
+  );
+}
+
+.routeContent {
+  flex: 1;
+}
+
+.routeLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.routeCity {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.tempPresetRow {
+  display: flex;
+  gap: $spacing-xs;
+  margin-top: $spacing-xs;
+  flex-wrap: wrap;
+}
+
+.tempPreset {
+  padding: 6rpx 16rpx;
+  border-radius: $radius-button;
+  background: rgba($color-accent-cyan, 0.1);
+  font-size: $font-size-xs;
+  color: $color-primary-dark;
+  font-weight: $font-weight-medium;
+}
+
+.personCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-sm;
+}
+
+.personAvatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+
+  &.shipper {
+    background: linear-gradient(135deg, $color-primary, $color-accent-cyan);
+  }
+
+  &.receiver {
+    background: linear-gradient(135deg, $color-accent-orange, $color-warning);
+  }
+}
+
+.personFields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.personInputs {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.pricePreview {
+  background: linear-gradient(135deg, rgba($color-price-start, 0.08) 0%, rgba($color-price-cap, 0.08) 100%);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  border: 2rpx dashed $color-border;
+}
+
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-xs 0;
+
+  &.highlight {
+    padding-top: $spacing-sm;
+    margin-top: $spacing-xs;
+    border-top: 1rpx solid $color-divider;
+  }
+}
+
+.priceLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.priceValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+
+  &.big {
+    font-size: $font-size-xl;
+    color: $color-primary-dark;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.tagMini {
+  padding: 2rpx 12rpx;
+  border-radius: $radius-xs;
+  font-size: 20rpx;
+  font-weight: $font-weight-medium;
+
+  &.start {
+    background: rgba($color-price-start, 0.15);
+    color: $color-price-start;
+  }
+
+  &.cap {
+    background: rgba($color-price-cap, 0.15);
+    color: $color-price-cap;
+  }
+
+  &.reward {
+    background: rgba($color-temp-normal, 0.15);
+    color: $color-temp-normal;
+  }
+}
+
+.submitBar {
+  position: sticky;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.btnSubmit {
+  flex: 1;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+  box-shadow: 0 8rpx 24rpx rgba($color-primary, 0.3);
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 4rpx 12rpx rgba($color-primary, 0.2);
+  }
+}
+
+.intelligentCard {
+  background: linear-gradient(135deg, rgba($color-primary, 0.12) 0%, rgba($color-accent-cyan, 0.08) 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  margin-bottom: $spacing-lg;
+  border: 2rpx solid rgba($color-primary, 0.2);
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+}
+
+.intelligentIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  background: linear-gradient(135deg, $color-primary, $color-accent-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  flex-shrink: 0;
+}
+
+.intelligentContent {
+  flex: 1;
+}
+
+.intelligentTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-primary-dark;
+  margin-bottom: 6rpx;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.intelligentBadge {
+  font-size: 20rpx;
+  padding: 2rpx 12rpx;
+  background: $color-primary-dark;
+  color: $color-text-white;
+  border-radius: $radius-button;
+  font-weight: $font-weight-medium;
+}
+
+.intelligentText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}
+
+.estimateInfo {
+  display: flex;
+  gap: $spacing-lg;
+  padding-top: $spacing-sm;
+  margin-top: $spacing-xs;
+  border-top: 1rpx solid rgba($color-border, 0.5);
+}
+
+.estimateItem {
+  flex: 1;
+  text-align: center;
+}
+
+.estimateNum {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  display: block;
+  line-height: 1.2;
+}
+
+.estimateLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.switchRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-xs 0;
+}
+
+.switchLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
