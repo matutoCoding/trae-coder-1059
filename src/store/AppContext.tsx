@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import type { Vehicle } from '@/types/vehicle';
-import type { Order } from '@/types/order';
+import type { Order, TemperatureRecord } from '@/types/order';
 import type { Bill } from '@/types/bill';
 import { mockVehicles } from '@/data/vehicles';
 import { mockOrders } from '@/data/orders';
@@ -8,13 +8,24 @@ import { mockBills } from '@/data/bills';
 import { assignVehicle, DispatchResult } from '@/utils/dispatch';
 import { calculateFreight, getRuleByCargoType } from '@/utils/billing';
 import { generateTemperatureRecords } from '@/utils/temperature';
+import Taro from '@tarojs/taro';
+
+const STORAGE_KEYS = {
+  vehicles: 'cc_vehicles',
+  orders: 'cc_orders',
+  bills: 'cc_bills',
+  initFlag: 'cc_data_init'
+};
 
 interface AppContextType {
   vehicles: Vehicle[];
   orders: Order[];
   bills: Bill[];
   addVehicle: (vehicle: Omit<Vehicle, 'id' | 'scheduleItems' | 'utilizationRate' | 'totalMileage'>) => void;
-  submitOrder: (order: Omit<Order, 'id' | 'orderNo' | 'status' | 'createTime' | 'temperatureRecords'>) => {
+  submitOrder: (
+    order: Omit<Order, 'id' | 'orderNo' | 'status' | 'createTime' | 'temperatureRecords'>,
+    options?: { presetTemperatureRecords?: TemperatureRecord[] }
+  ) => {
     order: Order;
     dispatchResult: DispatchResult;
     bill?: Bill;
@@ -22,21 +33,62 @@ interface AppContextType {
   getOrderById: (id: string) => Order | undefined;
   getVehicleById: (id: string) => Vehicle | undefined;
   getBillByOrderId: (orderId: string) => Bill | undefined;
+  resetData: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const loadFromStorage = <T,>(key: string, fallback: T): T => {
+  try {
+    const data = Taro.getStorageSync(key);
+    if (data) {
+      return typeof data === 'string' ? JSON.parse(data) : data;
+    }
+  } catch (e) {
+    console.warn('[AppContext] 读取缓存失败:', key, e);
+  }
+  return fallback;
+};
+
+const saveToStorage = (key: string, value: any) => {
+  try {
+    Taro.setStorageSync(key, JSON.stringify(value));
+  } catch (e) {
+    console.warn('[AppContext] 写入缓存失败:', key, e);
+  }
+};
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
-  const [bills, setBills] = useState<Bill[]>(mockBills);
+  const [vehicles, setVehicles] = useState<Vehicle[]>(() => loadFromStorage(STORAGE_KEYS.vehicles, mockVehicles));
+  const [orders, setOrders] = useState<Order[]>(() => loadFromStorage(STORAGE_KEYS.orders, mockOrders));
+  const [bills, setBills] = useState<Bill[]>(() => loadFromStorage(STORAGE_KEYS.bills, mockBills));
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.vehicles, vehicles);
+  }, [vehicles]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.orders, orders);
+  }, [orders]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.bills, bills);
+  }, [bills]);
 
   useEffect(() => {
     console.log('[AppContext] 初始化完成:', {
       vehicles: vehicles.length,
       orders: orders.length,
-      bills: bills.length
+      bills: bills.length,
+      storage: '已启用持久化'
     });
+  }, []);
+
+  const resetData = useCallback(() => {
+    setVehicles(mockVehicles);
+    setOrders(mockOrders);
+    setBills(mockBills);
+    Taro.showToast({ title: '已重置为初始数据', icon: 'success' });
   }, []);
 
   const addVehicle: AppContextType['addVehicle'] = (data) => {
@@ -51,14 +103,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     console.log('[AppContext] 新增车辆:', newVehicle.plateNumber);
   };
 
-  const submitOrder: AppContextType['submitOrder'] = (data) => {
+  const submitOrder: AppContextType['submitOrder'] = (data, options) => {
     const timestamp = Date.now();
-    const tempRecords = generateTemperatureRecords(
-      data.transportStartTime,
-      data.transportEndTime,
-      data.requirement.minTemp,
-      data.requirement.maxTemp
-    );
+    const tempRecords = options?.presetTemperatureRecords?.length
+      ? options.presetTemperatureRecords
+      : generateTemperatureRecords(
+          data.transportStartTime,
+          data.transportEndTime,
+          data.requirement.minTemp,
+          data.requirement.maxTemp
+        );
 
     const newOrder: Order = {
       ...data,
@@ -168,7 +222,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         submitOrder,
         getOrderById,
         getVehicleById,
-        getBillByOrderId
+        getBillByOrderId,
+        resetData
       }}
     >
       {children}

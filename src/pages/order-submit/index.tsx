@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { View, Text, Input, Textarea, Picker, ScrollView, Switch } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
 import { useAppContext } from '@/store/AppContext';
-import type { CargoType } from '@/types/order';
+import type { CargoType, TemperatureRecord } from '@/types/order';
 import { getRuleByCargoType, calculateFreight } from '@/utils/billing';
 import { estimateDistance } from '@/utils/dispatch';
+import { generateTemperatureRecords } from '@/utils/temperature';
 
 const CARGO_OPTIONS: { value: CargoType; label: string; icon: string }[] = [
   { value: 'frozen', label: '冷冻品', icon: '🧊' },
@@ -127,13 +128,27 @@ const OrderSubmitPage: React.FC = () => {
 
   const billingRule = useMemo(() => getRuleByCargoType(form.cargoType), [form.cargoType]);
 
+  const previewTempRecords = useMemo<TemperatureRecord[]>(() => {
+    if (!form.transportStartTime || !form.transportEndTime) return [];
+    try {
+      return generateTemperatureRecords(
+        form.transportStartTime,
+        form.transportEndTime,
+        Number(form.minTemp),
+        Number(form.maxTemp)
+      );
+    } catch (e) {
+      return [];
+    }
+  }, [form.transportStartTime, form.transportEndTime, form.minTemp, form.maxTemp]);
+
   const pricePreview = useMemo(() => {
     if (estimated.distance <= 0) return null;
     try {
       const result = calculateFreight(
         estimated.distance,
         billingRule,
-        [],
+        previewTempRecords,
         Number(form.minTemp),
         Number(form.maxTemp)
       );
@@ -141,7 +156,7 @@ const OrderSubmitPage: React.FC = () => {
     } catch (e) {
       return null;
     }
-  }, [estimated.distance, billingRule, form.minTemp, form.maxTemp]);
+  }, [estimated.distance, billingRule, previewTempRecords, form.minTemp, form.maxTemp]);
 
   const validate = (): string | null => {
     if (!form.cargoName.trim()) return '请输入货物名称';
@@ -177,30 +192,33 @@ const OrderSubmitPage: React.FC = () => {
     try {
       await Taro.showLoading({ title: '智能匹配中...', mask: true });
 
-      const { order, dispatchResult, bill } = submitOrder({
-        cargoName: form.cargoName.trim(),
-        cargoType: form.cargoType,
-        cargoWeight: Number(form.cargoWeight),
-        cargoVolume: Number(form.cargoVolume),
-        origin: form.origin,
-        originAddress: form.originAddress.trim(),
-        destination: form.destination,
-        destinationAddress: form.destinationAddress.trim(),
-        transportStartTime: form.transportStartTime,
-        transportEndTime: form.transportEndTime,
-        requirement: {
-          minTemp: Number(form.minTemp),
-          maxTemp: Number(form.maxTemp),
-          humidity: form.humidity ? Number(form.humidity) : undefined,
-          specialInstructions: form.specialInstructions.trim() || undefined
+      const { order, dispatchResult, bill } = submitOrder(
+        {
+          cargoName: form.cargoName.trim(),
+          cargoType: form.cargoType,
+          cargoWeight: Number(form.cargoWeight),
+          cargoVolume: Number(form.cargoVolume),
+          origin: form.origin,
+          originAddress: form.originAddress.trim(),
+          destination: form.destination,
+          destinationAddress: form.destinationAddress.trim(),
+          transportStartTime: form.transportStartTime,
+          transportEndTime: form.transportEndTime,
+          requirement: {
+            minTemp: Number(form.minTemp),
+            maxTemp: Number(form.maxTemp),
+            humidity: form.humidity ? Number(form.humidity) : undefined,
+            specialInstructions: form.specialInstructions.trim() || undefined
+          },
+          estimatedDistance: estimated.distance,
+          estimatedDuration: estimated.duration,
+          shipperName: form.shipperName.trim(),
+          shipperPhone: form.shipperPhone.trim(),
+          receiverName: form.receiverName.trim(),
+          receiverPhone: form.receiverPhone.trim()
         },
-        estimatedDistance: estimated.distance,
-        estimatedDuration: estimated.duration,
-        shipperName: form.shipperName.trim(),
-        shipperPhone: form.shipperPhone.trim(),
-        receiverName: form.receiverName.trim(),
-        receiverPhone: form.receiverPhone.trim()
-      });
+        { presetTemperatureRecords: previewTempRecords }
+      );
 
       Taro.hideLoading();
 

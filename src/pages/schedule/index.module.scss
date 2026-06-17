@@ -152,6 +152,161 @@
   margin-bottom: 120rpx;
 }
 
+.vehicleBlock {
+  margin-bottom: $spacing-md;
+}
+
+.scheduleExpand {
+  background: $color-bg-card;
+  border-radius: 0 0 $radius-lg $radius-lg;
+  margin-top: -$spacing-sm;
+  padding: 0 $spacing-md;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+  transition: all $transition-base;
+
+  &.open {
+    padding-bottom: $spacing-md;
+  }
+}
+
+.expandHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm $spacing-xs;
+  cursor: pointer;
+}
+
+.expandTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.expandArrow {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  transition: transform $transition-fast;
+}
+
+.scheduleList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding-top: $spacing-xs;
+}
+
+.schItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  border-left: 6rpx solid $color-primary;
+  position: relative;
+  transition: all $transition-fast;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+
+  &.upcoming {
+    border-left-color: $color-primary;
+    background: linear-gradient(90deg, rgba($color-primary, 0.06), $color-bg-page);
+  }
+
+  &.ongoing {
+    border-left-color: $color-success;
+    background: linear-gradient(90deg, rgba($color-success, 0.06), $color-bg-page);
+  }
+
+  &.completed {
+    border-left-color: $color-text-tertiary;
+    opacity: 0.7;
+  }
+}
+
+.schLeft {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.schStatusDot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  margin-top: 12rpx;
+  flex-shrink: 0;
+
+  .upcoming & { background: $color-primary; box-shadow: 0 0 0 6rpx rgba($color-primary, 0.2); }
+  .ongoing & { background: $color-success; box-shadow: 0 0 0 6rpx rgba($color-success, 0.2); }
+  .completed & { background: $color-text-tertiary; }
+}
+
+.schTimes {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.schTime {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+}
+
+.schTimeLabel {
+  color: $color-text-tertiary;
+  margin-right: 8rpx;
+  font-size: 20rpx;
+}
+
+.schRight {
+  flex: 1;
+  min-width: 0;
+}
+
+.schRoute {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+  display: block;
+}
+
+.schOrderNo {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-bottom: 4rpx;
+  display: block;
+}
+
+.schCargo {
+  font-size: 22rpx;
+  color: $color-text-tertiary;
+  display: block;
+}
+
+.schStatusTag {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-md;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-button;
+  font-size: 20rpx;
+  font-weight: $font-weight-medium;
+
+  .upcoming & { background: rgba($color-primary, 0.1); color: $color-primary; }
+  .ongoing & { background: rgba($color-success, 0.1); color: $color-success; }
+  .completed & { background: rgba($color-text-tertiary, 0.1); color: $color-text-tertiary; }
+}
+
 .addBtn {
   @include button-reset;
   position: fixed;

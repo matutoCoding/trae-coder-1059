@@ -5,7 +5,7 @@ import styles from './index.module.scss';
 import classnames from 'classnames';
 import { useAppContext } from '@/store/AppContext';
 import VehicleCard from '@/components/VehicleCard';
-import type { VehicleStatus } from '@/types/vehicle';
+import type { VehicleStatus, ScheduleItem } from '@/types/vehicle';
 
 const FILTERS: Array<{ key: VehicleStatus | 'all'; label: string }> = [
   { key: 'all', label: '全部' },
@@ -14,9 +14,16 @@ const FILTERS: Array<{ key: VehicleStatus | 'all'; label: string }> = [
   { key: 'maintain', label: '维护中' }
 ];
 
+const fmtTimeShort = (iso: string) => {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
 const SchedulePage: React.FC = () => {
-  const { vehicles } = useAppContext();
+  const { vehicles, orders } = useAppContext();
   const [filter, setFilter] = useState<VehicleStatus | 'all'>('all');
+  const [expandedVehicles, setExpandedVehicles] = useState<Record<string, boolean>>({});
 
   const statusStats = useMemo(() => ({
     idle: vehicles.filter(v => v.status === 'idle').length,
@@ -40,6 +47,20 @@ const SchedulePage: React.FC = () => {
     rate >= 80 ? styles.fillHigh : rate >= 50 ? styles.fillMid : styles.fillLow;
 
   const goAdd = () => Taro.navigateTo({ url: '/pages/vehicle-add/index' });
+
+  const toggleExpand = (vId: string) => {
+    setExpandedVehicles(prev => ({ ...prev, [vId]: !prev[vId] }));
+  };
+
+  const getOrderBySchedule = (sch: ScheduleItem) => {
+    return orders.find(o => o.id === sch.orderId);
+  };
+
+  const statusLabelMap = {
+    upcoming: { text: '待执行', cls: 'upcoming' },
+    ongoing: { text: '进行中', cls: 'ongoing' },
+    completed: { text: '已完成', cls: 'completed' }
+  };
 
   return (
     <ScrollView scrollY className={styles.page}>
@@ -95,7 +116,79 @@ const SchedulePage: React.FC = () => {
         <View className="sectionTitle">冷藏车资源（{sortedVehicles.length}辆）</View>
 
         <View className={styles.vehicleList}>
-          {sortedVehicles.map(v => <VehicleCard key={v.id} vehicle={v} />)}
+          {sortedVehicles.map(v => (
+            <View key={v.id} className={styles.vehicleBlock}>
+              <View onClick={() => toggleExpand(v.id)}>
+                <VehicleCard vehicle={v} />
+              </View>
+
+              {v.scheduleItems.length > 0 && (
+                <View
+                  className={classnames(
+                    styles.scheduleExpand,
+                    expandedVehicles[v.id] && styles.open
+                  )}
+                >
+                  <View className={styles.expandHeader}>
+                    <Text className={styles.expandTitle}>
+                      📅 排期任务（{v.scheduleItems.length}）
+                    </Text>
+                    <Text className={styles.expandArrow}>
+                      {expandedVehicles[v.id] ? '▲' : '▼'}
+                    </Text>
+                  </View>
+
+                  {expandedVehicles[v.id] && (
+                    <View className={styles.scheduleList}>
+                      {[...v.scheduleItems]
+                        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+                        .map(sch => {
+                          const order = getOrderBySchedule(sch);
+                          const st = statusLabelMap[sch.status];
+                          return (
+                            <View
+                              key={sch.id}
+                              className={classnames(styles.schItem, styles[st.cls])}
+                              onClick={() => {
+                                if (order) {
+                                  Taro.navigateTo({ url: `/pages/order-detail/index?id=${order.id}` });
+                                }
+                              }}
+                            >
+                              <View className={styles.schLeft}>
+                                <View className={styles.schStatusDot} />
+                                <View className={styles.schTimes}>
+                                  <Text className={styles.schTime}>
+                                    <Text className={styles.schTimeLabel}>装货</Text>
+                                    {fmtTimeShort(sch.startTime)}
+                                  </Text>
+                                  <Text className={styles.schTime}>
+                                    <Text className={styles.schTimeLabel}>送达</Text>
+                                    {fmtTimeShort(sch.endTime)}
+                                  </Text>
+                                </View>
+                              </View>
+                              <View className={styles.schRight}>
+                                <Text className={styles.schRoute}>
+                                  {sch.origin} → {sch.destination}
+                                </Text>
+                                <Text className={styles.schOrderNo}>
+                                  {order?.orderNo || sch.orderId}
+                                </Text>
+                                {order?.cargoName && (
+                                  <Text className={styles.schCargo}>📦 {order.cargoName}</Text>
+                                )}
+                              </View>
+                              <Text className={styles.schStatusTag}>{st.text}</Text>
+                            </View>
+                          );
+                        })}
+                    </View>
+                  )}
+                </View>
+              )}
+            </View>
+          ))}
         </View>
       </View>
 
