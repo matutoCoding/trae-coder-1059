@@ -205,9 +205,12 @@ const SchedulePage: React.FC = () => {
 
                       {viewMode === 'list' && (
                         <View className={styles.scheduleList}>
-                          {[...v.scheduleItems]
-                            .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
-                            .map(sch => {
+                          {getDaySchedules(v.scheduleItems, viewDate).length === 0 ? (
+                            <View className={styles.emptyDayList}>
+                              <Text style={{ color: '#90A4AE', fontSize: 24 }}>📭 {viewDate} 当天无运输任务，车辆空闲</Text>
+                            </View>
+                          ) : (
+                            getDaySchedules(v.scheduleItems, viewDate).map(sch => {
                               const order = getOrderBySchedule(sch);
                               const st = statusLabelMap[sch.status];
                               return (
@@ -247,7 +250,8 @@ const SchedulePage: React.FC = () => {
                                   <Text className={styles.schStatusTag}>{st.text}</Text>
                                 </View>
                               );
-                            })}
+                            })
+                          )}
                         </View>
                       )}
 

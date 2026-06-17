@@ -54,17 +54,25 @@ const DispatchPage: React.FC = () => {
 
     if (filterTempZone !== 'all') {
       list = list.filter(v => {
-        if (filterTempZone === 'frozen') return v.maxTemp <= -10;
-        if (filterTempZone === 'chilled') return v.minTemp <= -10 && v.maxTemp >= 0;
-        if (filterTempZone === 'fresh') return v.minTemp >= 0 && v.maxTemp <= 10;
-        if (filterTempZone === 'all_temp') return v.minTemp <= -18 && v.maxTemp >= 10;
+        if (filterTempZone === 'frozen') {
+          return v.minTemp <= -10 && v.maxTemp >= -25;
+        }
+        if (filterTempZone === 'chilled') {
+          return v.minTemp <= -10 && v.maxTemp >= 0;
+        }
+        if (filterTempZone === 'fresh') {
+          return v.minTemp <= 2 && v.maxTemp >= 10;
+        }
+        if (filterTempZone === 'all_temp') {
+          return v.minTemp <= -18 && v.maxTemp >= 10;
+        }
         return true;
       });
     }
 
     if (filterLoad !== 'all') {
       list = list.filter(v => {
-        const cap = v.cargoCapacity;
+        const cap = v.loadCapacity;
         if (filterLoad === 'light') return cap <= 5;
         if (filterLoad === 'medium') return cap > 5 && cap < 15;
         if (filterLoad === 'heavy') return cap >= 15;

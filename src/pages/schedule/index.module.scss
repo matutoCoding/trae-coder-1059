@@ -471,3 +471,11 @@
   text-align: center;
   padding-top: $spacing-xs;
 }
+
+.emptyDayList {
+  padding: $spacing-lg 0;
+  text-align: center;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  border: 2rpx dashed $color-border;
+}

@@ -385,3 +385,92 @@
   &.positive { color: $color-success; }
   &.negative { color: $color-error; }
 }
+
+.recSchedule {
+  background: linear-gradient(135deg, rgba($color-primary, 0.05) 0%, rgba($color-accent-cyan, 0.05) 100%);
+  border-radius: $radius-md;
+  padding: $spacing-sm;
+  margin-bottom: $spacing-sm;
+  border-left: 4rpx solid $color-primary;
+}
+
+.recSchHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.recSchTitle {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.recSchStatus {
+  font-size: 20rpx;
+  padding: 2rpx 12rpx;
+  border-radius: $radius-button;
+  font-weight: $font-weight-medium;
+
+  &.schUpcoming {
+    background: rgba($color-primary, 0.1);
+    color: $color-primary;
+  }
+
+  &.schOngoing {
+    background: rgba($color-success, 0.1);
+    color: $color-success;
+  }
+
+  &.schCompleted {
+    background: rgba($color-text-tertiary, 0.1);
+    color: $color-text-tertiary;
+  }
+}
+
+.recSchTimes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-xs;
+}
+
+.recSchTimeItem {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-sm;
+  padding: $spacing-xs;
+  text-align: center;
+}
+
+.recSchTimeLabel {
+  display: block;
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  margin-bottom: 2rpx;
+}
+
+.recSchTimeVal {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  font-family: 'Courier New', monospace;
+}
+
+.recSchArrow {
+  color: $color-primary;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+}
+
+.reconcileCard {
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.99);
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  }
+}

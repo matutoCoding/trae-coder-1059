@@ -24,6 +24,12 @@ const STATUS_OPTIONS: Array<{ key: OrderStatus | 'all'; label: string }> = [
   { key: 'cancelled', label: '已取消' }
 ];
 
+const fmtTimeShort = (iso: string) => {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
 const BillPage: React.FC = () => {
   const { bills, orders, vehicles } = useAppContext();
   const [filter, setFilter] = useState<'all' | 'paid' | 'pending'>('all');
@@ -94,8 +100,19 @@ const BillPage: React.FC = () => {
     Taro.navigateTo({ url: `/pages/vehicle-detail/index?id=${vehicleId}` });
   };
 
-  const getOrderByBill = (billId: string) => orders.find(o => o.id === billId);
+  const getOrderByBill = (billOrderId: string) => orders.find(o => o.id === billOrderId);
   const getVehicleByPlate = (plate: string) => vehicles.find(v => v.plateNumber === plate);
+  const getScheduleByOrder = (vehicleId: string | undefined, orderId: string) => {
+    if (!vehicleId) return undefined;
+    const v = vehicles.find(x => x.id === vehicleId);
+    return v?.scheduleItems.find(s => s.orderId === orderId);
+  };
+
+  const SCH_STATUS_LABEL: Record<string, { text: string; cls: string }> = {
+    upcoming: { text: '待执行', cls: 'schUpcoming' },
+    ongoing: { text: '进行中', cls: 'schOngoing' },
+    completed: { text: '已完成', cls: 'schCompleted' }
+  };
 
   return (
     <ScrollView scrollY className={styles.page}>
@@ -292,8 +309,14 @@ const BillPage: React.FC = () => {
               filteredBills.map(bill => {
                 const order = getOrderByBill(bill.orderId);
                 const vehicle = order?.assignedVehiclePlate ? getVehicleByPlate(order.assignedVehiclePlate) : undefined;
+                const schedule = order ? getScheduleByOrder(order.assignedVehicleId, order.id) : undefined;
+                const schStatus = schedule ? SCH_STATUS_LABEL[schedule.status] : undefined;
                 return (
-                  <View key={bill.id} className={styles.reconcileCard}>
+                  <View
+                    key={bill.id}
+                    className={styles.reconcileCard}
+                    onClick={() => order && goOrderDetail(order.id)}
+                  >
                     <View className={styles.recHeader}>
                       <View className={styles.recOrderNo}>📦 {order?.orderNo || bill.orderId}</View>
                       <View
@@ -312,31 +335,47 @@ const BillPage: React.FC = () => {
                     </View>
 
                     <View className={styles.recLinks}>
-                      <View
-                        className={styles.recLinkItem}
-                        onClick={() => order && goOrderDetail(order.id)}
-                      >
-                        <Text className={styles.recLinkIcon}>📋</Text>
-                        <Text className={styles.recLinkText}>订单详情</Text>
-                      </View>
-                      {vehicle && (
-                        <View
-                          className={styles.recLinkItem}
-                          onClick={() => goVehicleDetail(vehicle.id)}
-                        >
-                          <Text className={styles.recLinkIcon}>🚛</Text>
-                          <Text className={styles.recLinkText}>
-                            {order?.assignedVehiclePlate}
-                          </Text>
-                        </View>
-                      )}
                       <View className={styles.recLinkItem}>
-                        <Text className={styles.recLinkIcon}>📅</Text>
+                        <Text className={styles.recLinkIcon}>🚛</Text>
                         <Text className={styles.recLinkText}>
-                          {order ? order.transportStartTime.split('T')[0] : '-'}
+                          {order?.assignedVehiclePlate || '未分配'}
+                        </Text>
+                      </View>
+                      <View className={styles.recLinkItem}>
+                        <Text className={styles.recLinkIcon}>�</Text>
+                        <Text className={styles.recLinkText}>
+                          {order?.cargoName || '-'}
                         </Text>
                       </View>
                     </View>
+
+                    {schedule && (
+                      <View className={styles.recSchedule}>
+                        <View className={styles.recSchHeader}>
+                          <Text className={styles.recSchTitle}>📅 车辆排期</Text>
+                          {schStatus && (
+                            <Text className={classnames(styles.recSchStatus, styles[schStatus.cls])}>
+                              {schStatus.text}
+                            </Text>
+                          )}
+                        </View>
+                        <View className={styles.recSchTimes}>
+                          <View className={styles.recSchTimeItem}>
+                            <Text className={styles.recSchTimeLabel}>装货</Text>
+                            <Text className={styles.recSchTimeVal}>
+                              {fmtTimeShort(schedule.startTime)}
+                            </Text>
+                          </View>
+                          <View className={styles.recSchArrow}>➤</View>
+                          <View className={styles.recSchTimeItem}>
+                            <Text className={styles.recSchTimeLabel}>送达</Text>
+                            <Text className={styles.recSchTimeVal}>
+                              {fmtTimeShort(schedule.endTime)}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    )}
 
                     <View className={styles.recAmount}>
                       <Text className={styles.recAmountLabel}>账单金额</Text>

@@ -639,45 +639,56 @@ const OrderSubmitPage: React.FC = () => {
                 <Text className={styles.priceLabel}>计费规则</Text>
                 <Text className={styles.priceValue}>{billingRule.name}</Text>
               </View>
-              <View className={styles.priceRow}>
-                <Text className={styles.priceLabel}>
-                  <Text className={`${styles.tagMini} ${styles.start}`}>起步</Text>
-                  {estimated.distance <= billingRule.baseDistance ? '(含全程)' : `(含前${billingRule.baseDistance}km)`}
-                </Text>
-                <Text className={styles.priceValue}>¥{pricePreview.startPrice.toFixed(2)}</Text>
-              </View>
-              {pricePreview.mileagePrice > 0 && (
-                <View className={styles.priceRow}>
-                  <Text className={styles.priceLabel}>
-                    超里程 × {billingRule.pricePerKm}元
-                  </Text>
-                  <Text className={styles.priceValue}>¥{pricePreview.mileagePrice.toFixed(2)}</Text>
-                </View>
-              )}
-              {pricePreview.appliedCap && (
-                <View className={styles.priceRow}>
-                  <Text className={styles.priceLabel}>
-                    <Text className={`${styles.tagMini} ${styles.cap}`}>封顶</Text>
-                    长途封顶拦截
-                  </Text>
-                  <Text className={styles.priceValue} style={{ color: '#7B1FA2' }}>
-                    -¥{(pricePreview.startPrice + pricePreview.mileagePrice - billingRule.capPrice).toFixed(2)}
-                  </Text>
-                </View>
-              )}
-              <View className={styles.priceRow}>
-                <Text className={styles.priceLabel}>
-                  <Text className={`${styles.tagMini} ${styles.reward}`}>温控</Text>
-                  预估温度奖励
-                </Text>
-                <Text className={styles.priceValue} style={{ color: '#43A047' }}>
-                  +¥{(billingRule.basePrice * 0.03).toFixed(2)}
-                </Text>
-              </View>
+              {pricePreview.details.map((d, i) => {
+                const isHighlight = d.label.includes('合计') || d.label.includes('运费');
+                const isStart = d.label.includes('起步价');
+                const isCap = d.label.includes('封顶');
+                const isTempReward = d.label.includes('奖励');
+                const isTempPenalty = d.label.includes('扣款');
+                const isBoundary = d.label.includes('保护') || d.label.includes('拦截');
+                const valueColor = isTempReward
+                  ? '#43A047'
+                  : isTempPenalty
+                    ? '#E53935'
+                    : isCap
+                      ? '#7B1FA2'
+                      : isBoundary
+                        ? '#FF8F00'
+                        : undefined;
+                return (
+                  <View
+                    key={i}
+                    className={classnames(
+                      styles.priceRow,
+                      isHighlight && styles.highlight
+                    )}
+                  >
+                    <Text
+                      className={styles.priceLabel}
+                      style={isHighlight ? { fontSize: 28, fontWeight: 600 } : {}}
+                    >
+                      {isStart && <Text className={`${styles.tagMini} ${styles.start}`}>起步</Text>}
+                      {isCap && <Text className={`${styles.tagMini} ${styles.cap}`}>封顶</Text>}
+                      {isTempReward && <Text className={`${styles.tagMini} ${styles.reward}`}>温控</Text>}
+                      {isTempPenalty && <Text className={`${styles.tagMini} ${styles.penalty}`}>温控</Text>}
+                      {isBoundary && <Text className={`${styles.tagMini} ${styles.start}`}>边界</Text>}
+                      {d.label}
+                    </Text>
+                    <Text
+                      className={classnames(styles.priceValue, isHighlight && styles.big)}
+                      style={valueColor ? { color: valueColor } : {}}
+                    >
+                      {d.value >= 0 ? '+' : ''}¥{d.value.toFixed(2)}
+                    </Text>
+                  </View>
+                );
+              })}
               <View className={`${styles.priceRow} ${styles.highlight}`}>
-                <Text className={styles.priceLabel} style={{ fontSize: 28, fontWeight: 600 }}>预估运费</Text>
+                <Text className={styles.priceLabel} style={{ fontSize: 28, fontWeight: 600 }}>
+                  预估运费合计
+                </Text>
                 <Text className={`${styles.priceValue} ${styles.big}`}>
-                  ¥{(pricePreview.totalAmount + billingRule.basePrice * 0.03).toFixed(2)}
+                  ¥{pricePreview.totalAmount.toFixed(2)}
                 </Text>
               </View>
             </View>
