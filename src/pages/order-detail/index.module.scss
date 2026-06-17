@@ -166,3 +166,118 @@
 
 .totalRow .billLabel { font-size: $font-size-sm; color: $color-text-primary; font-weight: $font-weight-semibold; }
 .totalRow .billValue { font-size: $font-size-lg; color: $color-primary; font-weight: $font-weight-bold; }
+
+.actionBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  display: flex;
+  gap: $spacing-md;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+}
+
+.cancelBtn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: $font-size-md;
+  border-radius: $radius-md;
+  color: $color-text-secondary;
+  background: $color-bg-page;
+  border: none;
+  font-weight: $font-weight-medium;
+  &::after { border: none; }
+}
+
+.rescheduleBtn {
+  flex: 2;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: $font-size-md;
+  border-radius: $radius-md;
+  color: $color-text-white;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border: none;
+  font-weight: $font-weight-semibold;
+  &::after { border: none; }
+}
+
+.modalMask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  width: 600rpx;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+}
+
+.modalTitle {
+  display: block;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  text-align: center;
+  margin-bottom: $spacing-lg;
+}
+
+.pickerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.pickerLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.pickerVal {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  padding: $spacing-xs $spacing-md;
+  background: rgba(30, 136, 229, 0.08);
+  border-radius: $radius-sm;
+}
+
+.modalCancelBtn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: $font-size-sm;
+  border-radius: $radius-md;
+  color: $color-text-secondary;
+  background: $color-bg-page;
+  border: none;
+  &::after { border: none; }
+}
+
+.modalConfirmBtn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: $font-size-sm;
+  border-radius: $radius-md;
+  color: $color-text-white;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border: none;
+  &::after { border: none; }
+}

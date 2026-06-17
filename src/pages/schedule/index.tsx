@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, Button } from '@tarojs/components';
+import { View, Text, ScrollView, Button, Picker } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
@@ -20,10 +20,44 @@ const fmtTimeShort = (iso: string) => {
   return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
+const fmtDate = (d: Date) => {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+const addDays = (dateStr: string, days: number) => {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return fmtDate(d);
+};
+
+const getDaySchedules = (items: ScheduleItem[], dateStr: string) => {
+  const dayStart = new Date(`${dateStr}T00:00:00`).getTime();
+  const dayEnd = new Date(`${dateStr}T23:59:59`).getTime();
+  return items.filter(s => {
+    const sStart = new Date(s.startTime).getTime();
+    const sEnd = new Date(s.endTime).getTime();
+    return sEnd >= dayStart && sStart <= dayEnd;
+  }).sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+};
+
+const calcTimelineStyle = (sch: ScheduleItem, dateStr: string) => {
+  const dayStart = new Date(`${dateStr}T00:00:00`).getTime();
+  const totalMs = 24 * 60 * 60 * 1000;
+  const sStart = Math.max(dayStart, new Date(sch.startTime).getTime());
+  const sEnd = Math.min(dayStart + totalMs, new Date(sch.endTime).getTime());
+  const left = ((sStart - dayStart) / totalMs) * 100;
+  const width = Math.max(2, ((sEnd - sStart) / totalMs) * 100);
+  return { left: `${left}%`, width: `${width}%` };
+};
+
+const HOUR_MARKS = [0, 6, 12, 18, 24];
+
 const SchedulePage: React.FC = () => {
   const { vehicles, orders } = useAppContext();
   const [filter, setFilter] = useState<VehicleStatus | 'all'>('all');
   const [expandedVehicles, setExpandedVehicles] = useState<Record<string, boolean>>({});
+  const [viewDate, setViewDate] = useState(fmtDate(new Date()));
+  const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list');
 
   const statusStats = useMemo(() => ({
     idle: vehicles.filter(v => v.status === 'idle').length,
@@ -139,51 +173,128 @@ const SchedulePage: React.FC = () => {
                   </View>
 
                   {expandedVehicles[v.id] && (
-                    <View className={styles.scheduleList}>
-                      {[...v.scheduleItems]
-                        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
-                        .map(sch => {
-                          const order = getOrderBySchedule(sch);
-                          const st = statusLabelMap[sch.status];
-                          return (
-                            <View
-                              key={sch.id}
-                              className={classnames(styles.schItem, styles[st.cls])}
-                              onClick={() => {
-                                if (order) {
-                                  Taro.navigateTo({ url: `/pages/order-detail/index?id=${order.id}` });
-                                }
-                              }}
-                            >
-                              <View className={styles.schLeft}>
-                                <View className={styles.schStatusDot} />
-                                <View className={styles.schTimes}>
-                                  <Text className={styles.schTime}>
-                                    <Text className={styles.schTimeLabel}>装货</Text>
-                                    {fmtTimeShort(sch.startTime)}
-                                  </Text>
-                                  <Text className={styles.schTime}>
-                                    <Text className={styles.schTimeLabel}>送达</Text>
-                                    {fmtTimeShort(sch.endTime)}
+                    <>
+                      <View className={styles.dateToolbar}>
+                        <View className={styles.dateNav} onClick={() => setViewDate(addDays(viewDate, -1))}>
+                          <Text>◀ 前一天</Text>
+                        </View>
+                        <Picker
+                          mode="date"
+                          value={viewDate}
+                          onChange={e => setViewDate(e.detail.value)}
+                        >
+                          <View className={styles.datePickerText}>
+                            📆 {viewDate}
+                          </View>
+                        </Picker>
+                        <View className={styles.dateNav} onClick={() => setViewDate(addDays(viewDate, 1))}>
+                          <Text>后一天 ▶</Text>
+                        </View>
+                      </View>
+
+                      <View className={styles.viewToggle}>
+                        <View
+                          className={classnames(styles.viewTab, viewMode === 'list' && styles.active)}
+                          onClick={() => setViewMode('list')}
+                        >列表</View>
+                        <View
+                          className={classnames(styles.viewTab, viewMode === 'timeline' && styles.active)}
+                          onClick={() => setViewMode('timeline')}
+                        >时间轴</View>
+                      </View>
+
+                      {viewMode === 'list' && (
+                        <View className={styles.scheduleList}>
+                          {[...v.scheduleItems]
+                            .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+                            .map(sch => {
+                              const order = getOrderBySchedule(sch);
+                              const st = statusLabelMap[sch.status];
+                              return (
+                                <View
+                                  key={sch.id}
+                                  className={classnames(styles.schItem, styles[st.cls])}
+                                  onClick={() => {
+                                    if (order) {
+                                      Taro.navigateTo({ url: `/pages/order-detail/index?id=${order.id}` });
+                                    }
+                                  }}
+                                >
+                                  <View className={styles.schLeft}>
+                                    <View className={styles.schStatusDot} />
+                                    <View className={styles.schTimes}>
+                                      <Text className={styles.schTime}>
+                                        <Text className={styles.schTimeLabel}>装货</Text>
+                                        {fmtTimeShort(sch.startTime)}
+                                      </Text>
+                                      <Text className={styles.schTime}>
+                                        <Text className={styles.schTimeLabel}>送达</Text>
+                                        {fmtTimeShort(sch.endTime)}
+                                      </Text>
+                                    </View>
+                                  </View>
+                                  <View className={styles.schRight}>
+                                    <Text className={styles.schRoute}>
+                                      {sch.origin} → {sch.destination}
+                                    </Text>
+                                    <Text className={styles.schOrderNo}>
+                                      {order?.orderNo || sch.orderId}
+                                    </Text>
+                                    {order?.cargoName && (
+                                      <Text className={styles.schCargo}>📦 {order.cargoName}</Text>
+                                    )}
+                                  </View>
+                                  <Text className={styles.schStatusTag}>{st.text}</Text>
+                                </View>
+                              );
+                            })}
+                        </View>
+                      )}
+
+                      {viewMode === 'timeline' && (
+                        <View className={styles.timelineWrap}>
+                          <View className={styles.timelineHeader}>
+                            {HOUR_MARKS.map(h => (
+                              <Text key={h} className={styles.timelineHour}>{String(h).padStart(2, '0')}</Text>
+                            ))}
+                          </View>
+                          <View className={styles.timelineTrack}>
+                            {getDaySchedules(v.scheduleItems, viewDate).length === 0 && (
+                              <View className={styles.emptyDay}>
+                                <Text style={{ color: '#90A4AE', fontSize: 24 }}>📭 当天无运输任务，车辆空闲</Text>
+                              </View>
+                            )}
+                            {getDaySchedules(v.scheduleItems, viewDate).map(sch => {
+                              const order = getOrderBySchedule(sch);
+                              const st = statusLabelMap[sch.status];
+                              const style = calcTimelineStyle(sch, viewDate);
+                              return (
+                                <View
+                                  key={sch.id}
+                                  className={classnames(styles.tlBlock, styles[st.cls])}
+                                  style={style}
+                                  onClick={() => {
+                                    if (order) {
+                                      Taro.navigateTo({ url: `/pages/order-detail/index?id=${order.id}` });
+                                    }
+                                  }}
+                                >
+                                  <Text className={styles.tlRoute}>{sch.origin}→{sch.destination}</Text>
+                                  <Text className={styles.tlTime}>
+                                    {fmtTimeShort(sch.startTime).split(' ')[1]} - {fmtTimeShort(sch.endTime).split(' ')[1]}
                                   </Text>
                                 </View>
-                              </View>
-                              <View className={styles.schRight}>
-                                <Text className={styles.schRoute}>
-                                  {sch.origin} → {sch.destination}
-                                </Text>
-                                <Text className={styles.schOrderNo}>
-                                  {order?.orderNo || sch.orderId}
-                                </Text>
-                                {order?.cargoName && (
-                                  <Text className={styles.schCargo}>📦 {order.cargoName}</Text>
-                                )}
-                              </View>
-                              <Text className={styles.schStatusTag}>{st.text}</Text>
-                            </View>
-                          );
-                        })}
-                    </View>
+                              );
+                            })}
+                          </View>
+                          <View className={styles.timelineFooter}>
+                            <Text style={{ color: '#90A4AE', fontSize: 22 }}>
+                              🔵 空档可预约 · 点击任务块查看订单详情
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+                    </>
                   )}
                 </View>
               )}

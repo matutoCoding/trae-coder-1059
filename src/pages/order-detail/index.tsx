@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import { View, Text, ScrollView } from '@tarojs/components';
-import { useRouter } from '@tarojs/taro';
+import React, { useMemo, useState } from 'react';
+import { View, Text, ScrollView, Button, Picker } from '@tarojs/components';
+import { useRouter, Taro } from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
 import { useAppContext } from '@/store/AppContext';
@@ -45,6 +45,58 @@ const OrderDetailPage: React.FC = () => {
     () => getBillByOrderId(orderId),
     [orderId, getBillByOrderId]
   );
+
+  const [showReschedule, setShowReschedule] = useState(false);
+  const [newStartDate, setNewStartDate] = useState('');
+  const [newStartTime, setNewStartTime] = useState('08:00');
+  const [newEndDate, setNewEndDate] = useState('');
+  const [newEndTime, setNewEndTime] = useState('18:00');
+  const { cancelOrder, rescheduleOrder } = useAppContext();
+
+  const canModify = order && order.status !== 'completed' && order.status !== 'cancelled' && order.status !== 'delivered';
+
+  const openReschedule = () => {
+    if (!order) return;
+    const startD = new Date(order.transportStartTime);
+    const endD = new Date(order.transportEndTime);
+    setNewStartDate(startD.toISOString().split('T')[0]);
+    setNewStartTime(`${String(startD.getHours()).padStart(2, '0')}:${String(startD.getMinutes()).padStart(2, '0')}`);
+    setNewEndDate(endD.toISOString().split('T')[0]);
+    setNewEndTime(`${String(endD.getHours()).padStart(2, '0')}:${String(endD.getMinutes()).padStart(2, '0')}`);
+    setShowReschedule(true);
+  };
+
+  const handleReschedule = () => {
+    if (!order || !newStartDate || !newEndDate) return;
+    const fullStart = `${newStartDate}T${newStartTime}:00`;
+    const fullEnd = `${newEndDate}T${newEndTime}:00`;
+    const result = rescheduleOrder(order.id, fullStart, fullEnd);
+    Taro.showToast({
+      title: result.message || (result.success ? '改期成功' : '改期失败'),
+      icon: result.success ? 'success' : 'none',
+      duration: 2000
+    });
+    setShowReschedule(false);
+  };
+
+  const handleCancel = () => {
+    if (!order) return;
+    Taro.showModal({
+      title: '确认取消订单',
+      content: `确定要取消订单 ${order.orderNo} 吗？\n取消后车辆将被释放，无法恢复。`,
+      confirmText: '确认取消',
+      cancelText: '再想想',
+      confirmColor: '#FF5252',
+      success: (res) => {
+        if (res.confirm) {
+          const ok = cancelOrder(order.id);
+          if (ok) {
+            Taro.showToast({ title: '订单已取消', icon: 'success' });
+          }
+        }
+      }
+    });
+  };
 
   const estBill = useMemo(() => {
     if (!order) return null;
@@ -226,6 +278,71 @@ const OrderDetailPage: React.FC = () => {
           </View>
         </View>
       </View>
+
+      {canModify && (
+        <View className={styles.actionBar}>
+          <Button className={styles.cancelBtn} onClick={handleCancel}>取消订单</Button>
+          <Button className={styles.rescheduleBtn} onClick={openReschedule}>改期</Button>
+        </View>
+      )}
+
+      {showReschedule && (
+        <View className={styles.modalMask} onClick={() => setShowReschedule(false)}>
+          <View className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <Text className={styles.modalTitle}>📅 订单改期</Text>
+            <View className={styles.pickerRow}>
+              <Text className={styles.pickerLabel}>装货日期</Text>
+              <Picker
+                mode="date"
+                value={newStartDate}
+                onChange={e => setNewStartDate(e.detail.value)}
+              >
+                <View className={styles.pickerVal}>{newStartDate || '请选择'}</View>
+              </Picker>
+            </View>
+            <View className={styles.pickerRow}>
+              <Text className={styles.pickerLabel}>装货时间</Text>
+              <Picker
+                mode="time"
+                value={newStartTime}
+                onChange={e => setNewStartTime(e.detail.value)}
+              >
+                <View className={styles.pickerVal}>{newStartTime}</View>
+              </Picker>
+            </View>
+            <View className={styles.pickerRow}>
+              <Text className={styles.pickerLabel}>送达日期</Text>
+              <Picker
+                mode="date"
+                value={newEndDate}
+                onChange={e => setNewEndDate(e.detail.value)}
+              >
+                <View className={styles.pickerVal}>{newEndDate || '请选择'}</View>
+              </Picker>
+            </View>
+            <View className={styles.pickerRow}>
+              <Text className={styles.pickerLabel}>送达时间</Text>
+              <Picker
+                mode="time"
+                value={newEndTime}
+                onChange={e => setNewEndTime(e.detail.value)}
+              >
+                <View className={styles.pickerVal}>{newEndTime}</View>
+              </Picker>
+            </View>
+            <View style={{ display: 'flex', gap: 16, marginTop: 24 }}>
+              <Button
+                className={styles.modalCancelBtn}
+                onClick={() => setShowReschedule(false)}
+              >取消</Button>
+              <Button
+                className={styles.modalConfirmBtn}
+                onClick={handleReschedule}
+              >确认改期</Button>
+            </View>
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 };

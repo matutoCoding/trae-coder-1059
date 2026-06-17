@@ -203,3 +203,185 @@
 }
 
 .billList { margin-bottom: 120rpx; }
+
+.viewModeToggle {
+  display: flex;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: 6rpx;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.viewTab {
+  flex: 1;
+  text-align: center;
+  padding: $spacing-sm 0;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  border-radius: $radius-sm;
+  transition: all $transition-fast;
+  font-weight: $font-weight-medium;
+
+  &.active {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+    color: $color-text-white;
+    font-weight: $font-weight-semibold;
+    box-shadow: 0 4rpx 12rpx rgba($color-primary, 0.25);
+  }
+}
+
+.reconcileFilters {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.filterPicker {
+  flex: 1;
+  min-width: 200rpx;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  color: $color-text-primary;
+  text-align: center;
+  box-shadow: $shadow-card;
+  border: 1rpx solid $color-border;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.reconcileList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: 120rpx;
+}
+
+.reconcileCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  border-left: 8rpx solid $color-primary;
+}
+
+.recHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.recOrderNo {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.recStatus {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-button;
+  font-size: 20rpx;
+  font-weight: $font-weight-medium;
+
+  &.paid {
+    background: rgba($color-success, 0.1);
+    color: $color-success;
+  }
+
+  &.pending {
+    background: rgba($color-warning, 0.1);
+    color: $color-warning;
+  }
+}
+
+.recRoute {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.recLinks {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx dashed $color-divider;
+}
+
+.recLinkItem {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 4rpx 12rpx;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  font-size: 20rpx;
+  color: $color-text-secondary;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.recLinkIcon {
+  font-size: 22rpx;
+}
+
+.recLinkText {
+  font-size: 20rpx;
+}
+
+.recAmount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.recAmountLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.recAmountValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.recDetails {
+  display: flex;
+  gap: $spacing-sm;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-sm;
+}
+
+.recDetailItem {
+  flex: 1;
+  text-align: center;
+}
+
+.recDetailLabel {
+  display: block;
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.recDetailVal {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  font-family: 'Courier New', monospace;
+
+  &.positive { color: $color-success; }
+  &.negative { color: $color-error; }
+}

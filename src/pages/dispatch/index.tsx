@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, Button } from '@tarojs/components';
+import { View, Text, ScrollView, Button, Picker } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
@@ -10,10 +10,34 @@ import Tag from '@/components/Tag';
 import { findMatchingVehicles, getLoadBalancingStats, DispatchCandidate } from '@/utils/dispatch';
 import type { Order } from '@/types/order';
 
+const TEMP_ZONE_OPTIONS = [
+  { key: 'all', label: '全部温区' },
+  { key: 'frozen', label: '冷冻（≤-10℃）' },
+  { key: 'chilled', label: '冷藏（-10~0℃）' },
+  { key: 'fresh', label: '保鲜（0~10℃）' },
+  { key: 'all_temp', label: '全温区' }
+];
+
+const LOAD_OPTIONS = [
+  { key: 'all', label: '全部载重' },
+  { key: 'light', label: '轻型（≤5吨）' },
+  { key: 'medium', label: '中型（5-15吨）' },
+  { key: 'heavy', label: '重型（≥15吨）' }
+];
+
 const DispatchPage: React.FC = () => {
   const { orders, vehicles } = useAppContext();
   const [matchingFor, setMatchingFor] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<DispatchCandidate[]>([]);
+  const [filterTempZone, setFilterTempZone] = useState('all');
+  const [filterLoad, setFilterLoad] = useState('all');
+  const [filterLocation, setFilterLocation] = useState('all');
+  const [showFilters, setShowFilters] = useState(false);
+
+  const locationOptions = useMemo(() => {
+    const locs = new Set(vehicles.map(v => v.currentLocation).filter(Boolean));
+    return [{ key: 'all', label: '全部位置' }, ...[...locs].map(l => ({ key: l, label: l }))];
+  }, [vehicles]);
 
   const pendingOrders = useMemo(
     () => orders.filter(o => o.status === 'pending'),
@@ -24,6 +48,38 @@ const DispatchPage: React.FC = () => {
     [vehicles]
   );
   const lbStats = useMemo(() => getLoadBalancingStats(vehicles), [vehicles]);
+
+  const filteredIdleVehicles = useMemo(() => {
+    let list = idleVehicles;
+
+    if (filterTempZone !== 'all') {
+      list = list.filter(v => {
+        if (filterTempZone === 'frozen') return v.maxTemp <= -10;
+        if (filterTempZone === 'chilled') return v.minTemp <= -10 && v.maxTemp >= 0;
+        if (filterTempZone === 'fresh') return v.minTemp >= 0 && v.maxTemp <= 10;
+        if (filterTempZone === 'all_temp') return v.minTemp <= -18 && v.maxTemp >= 10;
+        return true;
+      });
+    }
+
+    if (filterLoad !== 'all') {
+      list = list.filter(v => {
+        const cap = v.cargoCapacity;
+        if (filterLoad === 'light') return cap <= 5;
+        if (filterLoad === 'medium') return cap > 5 && cap < 15;
+        if (filterLoad === 'heavy') return cap >= 15;
+        return true;
+      });
+    }
+
+    if (filterLocation !== 'all') {
+      list = list.filter(v => v.currentLocation === filterLocation);
+    }
+
+    return list;
+  }, [idleVehicles, filterTempZone, filterLoad, filterLocation]);
+
+  const activeFilterCount = [filterTempZone, filterLoad, filterLocation].filter(f => f !== 'all').length;
 
   const handleMatch = (order: Order) => {
     console.log('[Dispatch] 开始匹配:', order.orderNo);
@@ -177,15 +233,95 @@ const DispatchPage: React.FC = () => {
 
         <View className={styles.idlePool}>
           <View className={styles.poolHeader}>
-            <Text className={styles.poolTitle}>🚛 空闲冷藏车池</Text>
-            <Text className={styles.poolCount}>共 {idleVehicles.length} 辆可用</Text>
+            <View style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <Text className={styles.poolTitle}>🚛 空闲冷藏车池</Text>
+              {activeFilterCount > 0 && (
+                <Tag text={`${activeFilterCount}个筛选`} type="primary" size="sm" />
+              )}
+            </View>
+            <View
+              className={styles.filterToggle}
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Text>{showFilters ? '收起筛选 ▲' : '筛选 ▼'}</Text>
+            </View>
           </View>
-          {idleVehicles.length === 0 ? (
+
+          {showFilters && (
+            <View className={styles.filterPanel}>
+              <View className={styles.filterRow}>
+                <Text className={styles.filterLabel}>❄️ 温区</Text>
+                <View className={styles.filterChips}>
+                  {TEMP_ZONE_OPTIONS.map(opt => (
+                    <View
+                      key={opt.key}
+                      className={classnames(
+                        styles.filterChip,
+                        filterTempZone === opt.key && styles.active
+                      )}
+                      onClick={() => setFilterTempZone(opt.key)}
+                    >
+                      {opt.label}
+                    </View>
+                  ))}
+                </View>
+              </View>
+              <View className={styles.filterRow}>
+                <Text className={styles.filterLabel}>⚖️ 载重</Text>
+                <View className={styles.filterChips}>
+                  {LOAD_OPTIONS.map(opt => (
+                    <View
+                      key={opt.key}
+                      className={classnames(
+                        styles.filterChip,
+                        filterLoad === opt.key && styles.active
+                      )}
+                      onClick={() => setFilterLoad(opt.key)}
+                    >
+                      {opt.label}
+                    </View>
+                  ))}
+                </View>
+              </View>
+              <View className={styles.filterRow}>
+                <Text className={styles.filterLabel}>📍 位置</Text>
+                <Picker
+                  mode="selector"
+                  range={locationOptions.map(o => o.label)}
+                  value={locationOptions.findIndex(o => o.key === filterLocation)}
+                  onChange={e => setFilterLocation(locationOptions[Number(e.detail.value)].key)}
+                >
+                  <View className={styles.locationPicker}>
+                    {locationOptions.find(o => o.key === filterLocation)?.label || '全部位置'}
+                  </View>
+                </Picker>
+              </View>
+              <View className={styles.filterResetRow}>
+                <View
+                  className={styles.resetBtn}
+                  onClick={() => {
+                    setFilterTempZone('all');
+                    setFilterLoad('all');
+                    setFilterLocation('all');
+                  }}
+                >
+                  🔄 重置筛选
+                </View>
+                <Text className={styles.filterResult}>
+                  筛选后 {filteredIdleVehicles.length} 辆可用
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {filteredIdleVehicles.length === 0 ? (
             <View style={{ padding: '40rpx 0', textAlign: 'center' }}>
-              <Text style={{ color: '#90A4AE', fontSize: '26rpx' }}>暂无空闲车辆</Text>
+              <Text style={{ color: '#90A4AE', fontSize: '26rpx' }}>
+                {activeFilterCount > 0 ? '没有符合筛选条件的车辆' : '暂无空闲车辆'}
+              </Text>
             </View>
           ) : (
-            idleVehicles.map(v => <VehicleCard key={v.id} vehicle={v} compact />)
+            filteredIdleVehicles.map(v => <VehicleCard key={v.id} vehicle={v} compact />)
           )}
         </View>
       </View>

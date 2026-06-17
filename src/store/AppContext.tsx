@@ -33,6 +33,12 @@ interface AppContextType {
   getOrderById: (id: string) => Order | undefined;
   getVehicleById: (id: string) => Vehicle | undefined;
   getBillByOrderId: (orderId: string) => Bill | undefined;
+  cancelOrder: (orderId: string) => boolean;
+  rescheduleOrder: (orderId: string, newStartTime: string, newEndTime: string) => {
+    success: boolean;
+    message?: string;
+    needReassign?: boolean;
+  };
   resetData: () => void;
 }
 
@@ -212,6 +218,152 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const getVehicleById = (id: string) => vehicles.find(v => v.id === id);
   const getBillByOrderId = (orderId: string) => bills.find(b => b.orderId === orderId);
 
+  const cancelOrder = (orderId: string): boolean => {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return false;
+    if (order.status === 'completed' || order.status === 'cancelled') return false;
+
+    if (order.assignedVehicleId) {
+      setVehicles(prev => prev.map(v => {
+        if (v.id !== order.assignedVehicleId) return v;
+        const newScheduleItems = v.scheduleItems.filter(s => s.orderId !== orderId);
+        const upcomingCount = newScheduleItems.filter(s => s.status !== 'completed').length;
+        const newUtilization = Math.max(0, Math.round(v.utilizationRate * 0.7 - 25));
+        return {
+          ...v,
+          scheduleItems: newScheduleItems,
+          status: upcomingCount === 0 ? 'idle' : v.status,
+          utilizationRate: Math.max(0, Math.min(100, newUtilization))
+        };
+      }));
+    }
+
+    setOrders(prev => prev.map(o =>
+      o.id === orderId ? { ...o, status: 'cancelled' as const } : o
+    ));
+
+    setBills(prev => prev.map(b =>
+      b.orderId === orderId ? { ...b, status: 'overdue' as const } : b
+    ));
+
+    console.log('[AppContext] 取消订单:', order.orderNo);
+    return true;
+  };
+
+  const rescheduleOrder = (
+    orderId: string,
+    newStartTime: string,
+    newEndTime: string
+  ): { success: boolean; message?: string; needReassign?: boolean } => {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return { success: false, message: '订单不存在' };
+    if (order.status === 'completed' || order.status === 'cancelled') {
+      return { success: false, message: '该订单状态不支持改期' };
+    }
+    if (new Date(newEndTime) <= new Date(newStartTime)) {
+      return { success: false, message: '结束时间必须晚于开始时间' };
+    }
+
+    let needReassign = false;
+
+    if (order.assignedVehicleId) {
+      const vehicle = vehicles.find(v => v.id === order.assignedVehicleId);
+      if (vehicle) {
+        const hasConflict = vehicle.scheduleItems.some(s => {
+          if (s.orderId === orderId) return false;
+          if (s.status === 'completed') return false;
+          const sStart = new Date(s.startTime).getTime();
+          const sEnd = new Date(s.endTime).getTime();
+          const nStart = new Date(newStartTime).getTime();
+          const nEnd = new Date(newEndTime).getTime();
+          return !(nEnd <= sStart || nStart >= sEnd);
+        });
+
+        if (hasConflict) {
+          needReassign = true;
+          setVehicles(prev => prev.map(v => {
+            if (v.id !== order.assignedVehicleId) return v;
+            const newScheduleItems = v.scheduleItems.filter(s => s.orderId !== orderId);
+            const upcomingCount = newScheduleItems.filter(s => s.status !== 'completed').length;
+            const newUtilization = Math.max(0, Math.round(v.utilizationRate * 0.7 - 25));
+            return {
+              ...v,
+              scheduleItems: newScheduleItems,
+              status: upcomingCount === 0 ? 'idle' : v.status,
+              utilizationRate: Math.max(0, Math.min(100, newUtilization))
+            };
+          }));
+        } else {
+          setVehicles(prev => prev.map(v => {
+            if (v.id !== order.assignedVehicleId) return v;
+            return {
+              ...v,
+              scheduleItems: v.scheduleItems.map(s =>
+                s.orderId === orderId
+                  ? { ...s, startTime: newStartTime, endTime: newEndTime }
+                  : s
+              )
+            };
+          }));
+        }
+      }
+    }
+
+    const newTempRecords = generateTemperatureRecords(
+      newStartTime,
+      newEndTime,
+      order.requirement.minTemp,
+      order.requirement.maxTemp
+    );
+
+    setOrders(prev => prev.map(o => {
+      if (o.id !== orderId) return o;
+      return {
+        ...o,
+        transportStartTime: newStartTime,
+        transportEndTime: newEndTime,
+        temperatureRecords: newTempRecords,
+        status: needReassign ? 'pending' as const : o.status,
+        assignedVehicleId: needReassign ? undefined : o.assignedVehicleId,
+        assignedVehiclePlate: needReassign ? undefined : o.assignedVehiclePlate
+      };
+    }));
+
+    if (!needReassign) {
+      const billingRule = getRuleByCargoType(order.cargoType);
+      const newBilling = calculateFreight(
+        order.estimatedDistance,
+        billingRule,
+        newTempRecords,
+        order.requirement.minTemp,
+        order.requirement.maxTemp
+      );
+      setBills(prev => prev.map(b =>
+        b.orderId === orderId
+          ? {
+              ...b,
+              totalAmount: newBilling.totalAmount,
+              tempAdjustment: newBilling.tempAdjustment,
+              temperatureCompliance: newBilling.temperatureCompliance,
+              details: newBilling.details
+            }
+          : b
+      ));
+    }
+
+    console.log('[AppContext] 订单改期:', {
+      orderNo: order.orderNo,
+      needReassign,
+      newTime: `${newStartTime} ~ ${newEndTime}`
+    });
+
+    return {
+      success: true,
+      needReassign,
+      message: needReassign ? '改期后与该车排期冲突，已释放车辆，请重新分配' : '改期成功'
+    };
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -223,6 +375,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         getOrderById,
         getVehicleById,
         getBillByOrderId,
+        cancelOrder,
+        rescheduleOrder,
         resetData
       }}
     >
