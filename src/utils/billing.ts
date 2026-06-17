@@ -109,11 +109,42 @@ export const calculateFreight = (
   totalAmount = Math.round((totalAmount + tempAdjustment) * 100) / 100;
   totalAmount = Math.max(0, totalAmount);
 
+  const minAllowed = rule.basePrice;
+  const maxAllowed = rule.capPrice + (rule.tempBonus || 0);
+  let boundaryAdjusted = false;
+
+  if (totalAmount < minAllowed) {
+    const diff = minAllowed - totalAmount;
+    totalAmount = minAllowed;
+    tempAdjustment = Math.round((tempAdjustment + diff) * 100) / 100;
+    boundaryAdjusted = true;
+    details.push({
+      label: '最低运费保护',
+      value: diff,
+      unit: '元',
+      description: `温控扣款后不低于起步价¥${rule.basePrice}`
+    });
+    console.log('[Billing] 触发最低运费保护:', { diff, newTotal: totalAmount });
+  } else if (totalAmount > maxAllowed) {
+    const diff = totalAmount - maxAllowed;
+    totalAmount = maxAllowed;
+    tempAdjustment = Math.round((tempAdjustment - diff) * 100) / 100;
+    boundaryAdjusted = true;
+    details.push({
+      label: '最高金额拦截',
+      value: -diff,
+      unit: '元',
+      description: `含奖励不超过封顶+奖励上限¥${maxAllowed}`
+    });
+    console.log('[Billing] 触发最高金额拦截:', { diff, newTotal: totalAmount });
+  }
+
   console.log('[Billing] 计算结果:', {
     totalAmount,
     isStartPriceApplied,
     isCapPriceApplied,
-    compliance
+    compliance,
+    boundaryAdjusted
   });
 
   return {

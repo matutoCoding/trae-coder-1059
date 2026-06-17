@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
 import { useAppContext } from '@/store/AppContext';
 import type { CargoType } from '@/types/order';
-import { getRuleByCargoType, calculateFreight, validateBoundaryAmount } from '@/utils/billing';
+import { getRuleByCargoType, calculateFreight } from '@/utils/billing';
 import { estimateDistance } from '@/utils/dispatch';
 
 const CARGO_OPTIONS: { value: CargoType; label: string; icon: string }[] = [
@@ -47,13 +47,35 @@ interface FormState {
   needInsurance: boolean;
 }
 
+const YEARS = ['2025', '2026'];
+const MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+const DAYS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'];
+const HOURS = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
+const MINUTES = ['00', '30'];
+
+const TIME_RANGE = [YEARS, MONTHS, DAYS, HOURS, MINUTES];
+
+const parseTimeToPickerValue = (timeStr: string): number[] => {
+  if (!timeStr) return [1, 5, 18, 8, 0];
+  const match = timeStr.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
+  if (!match) return [1, 5, 18, 8, 0];
+  const [, year, month, day, hour, minute] = match;
+  return [
+    Math.max(0, YEARS.indexOf(year)),
+    Math.max(0, parseInt(month, 10) - 1),
+    Math.max(0, parseInt(day, 10) - 1),
+    Math.max(0, parseInt(hour, 10)),
+    minute === '30' ? 1 : 0
+  ];
+};
+
 const getDefaultTimes = () => {
   const now = new Date();
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const dayAfter = new Date(now.getTime() + 48 * 60 * 60 * 1000);
   const fmt = (d: Date) => {
     const pad = (n: number) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours() + 1)}:00`;
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:00`;
   };
   return {
     start: fmt(tomorrow),
@@ -141,10 +163,6 @@ const OrderSubmitPage: React.FC = () => {
     if (!/^1[3-9]\d{9}$/.test(form.shipperPhone)) return '请输入发货人正确手机号';
     if (!form.receiverName.trim()) return '请输入收货人姓名';
     if (!/^1[3-9]\d{9}$/.test(form.receiverPhone)) return '请输入收货人正确手机号';
-    if (pricePreview) {
-      const v = validateBoundaryAmount(pricePreview.totalAmount, billingRule);
-      if (!v.valid) return `计费校验失败：${v.message}`;
-    }
     return null;
   };
 
@@ -159,7 +177,7 @@ const OrderSubmitPage: React.FC = () => {
     try {
       await Taro.showLoading({ title: '智能匹配中...', mask: true });
 
-      const { order, dispatchResult } = submitOrder({
+      const { order, dispatchResult, bill } = submitOrder({
         cargoName: form.cargoName.trim(),
         cargoType: form.cargoType,
         cargoWeight: Number(form.cargoWeight),
@@ -186,10 +204,10 @@ const OrderSubmitPage: React.FC = () => {
 
       Taro.hideLoading();
 
-      if (dispatchResult.success) {
+      if (dispatchResult.success && bill) {
         Taro.showModal({
           title: '✅ 智能匹配成功',
-          content: `订单号：${order.orderNo}\n已为您分配最优车辆：${dispatchResult.assignedVehicle?.plateNumber}\n综合匹配度：${(dispatchResult.score || 0).toFixed(1)}分\n\n点击确认查看订单详情`,
+          content: `订单号：${order.orderNo}\n已为您分配最优车辆：${dispatchResult.assignedVehicle?.plateNumber}\n综合匹配度：${(dispatchResult.score || 0).toFixed(1)}分\n预估运费：¥${bill.totalAmount.toFixed(2)}\n计费规则：${bill.appliedRule}\n\n点击确认查看订单详情`,
           showCancel: true,
           cancelText: '返回列表',
           confirmText: '查看详情',
@@ -409,18 +427,17 @@ const OrderSubmitPage: React.FC = () => {
               </Text>
               <Picker
                 mode="multiSelector"
-                range={[
-                  ['2025', '2026'],
-                  ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
-                  ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'],
-                  ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'],
-                  ['00', '30']
-                ]}
-                value={[1, 5, 18, 8, 0]}
+                range={TIME_RANGE}
+                value={parseTimeToPickerValue(form.transportStartTime)}
                 onChange={(e) => {
-                  const [y, m, d, h, mm] = (e.detail.value as number[]).map(i => i + 1);
+                  const [yIdx, mIdx, dIdx, hIdx, mmIdx] = e.detail.value as number[];
                   const pad = (n: number) => String(n).padStart(2, '0');
-                  updateField('transportStartTime', `2026-${pad(m)}-${pad(d)} ${pad(h - 1)}:${mm === 1 ? '30' : '00'}`);
+                  const year = YEARS[yIdx];
+                  const month = pad(mIdx + 1);
+                  const day = pad(dIdx + 1);
+                  const hour = pad(hIdx);
+                  const minute = MINUTES[mmIdx];
+                  updateField('transportStartTime', `${year}-${month}-${day} ${hour}:${minute}`);
                 }}
               >
                 <View className={styles.pickerWrap}>
@@ -437,18 +454,17 @@ const OrderSubmitPage: React.FC = () => {
               </Text>
               <Picker
                 mode="multiSelector"
-                range={[
-                  ['2025', '2026'],
-                  ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
-                  ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'],
-                  ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'],
-                  ['00', '30']
-                ]}
-                value={[1, 5, 19, 14, 0]}
+                range={TIME_RANGE}
+                value={parseTimeToPickerValue(form.transportEndTime)}
                 onChange={(e) => {
-                  const [y, m, d, h, mm] = (e.detail.value as number[]).map(i => i + 1);
+                  const [yIdx, mIdx, dIdx, hIdx, mmIdx] = e.detail.value as number[];
                   const pad = (n: number) => String(n).padStart(2, '0');
-                  updateField('transportEndTime', `2026-${pad(m)}-${pad(d)} ${pad(h - 1)}:${mm === 1 ? '30' : '00'}`);
+                  const year = YEARS[yIdx];
+                  const month = pad(mIdx + 1);
+                  const day = pad(dIdx + 1);
+                  const hour = pad(hIdx);
+                  const minute = MINUTES[mmIdx];
+                  updateField('transportEndTime', `${year}-${month}-${day} ${hour}:${minute}`);
                 }}
               >
                 <View className={styles.pickerWrap}>
